@@ -1,0 +1,66 @@
+---
+const features = [
+  {
+    title: 'Advanced stepping',
+    href: '/features#stepping',
+    description:
+      'Step through standard and user-defined functional objects directly to the call target, skipping standard library code.',
+  },
+  {
+    title: 'Value formatters',
+    href: '/features#value-formatters',
+    description:
+      'Built-in formatters for libstdc++ and libc++, including lambdas and standard functional objects.',
+  },
+  {
+    title: 'Call stack grouping',
+    href: '/features#call-stack',
+    description:
+      'Frames of no interest are moved into child items, so user frames are not separated by library code.',
+  },
+  {
+    title: 'Source code navigation',
+    href: '/features#navigation',
+    description:
+      'Open the definition of a variable, its type, or the target stored in a standard functional object.',
+  },
+];
+---
+
+<!-- ====== Features Section Start -->
+<section class="pt-10 pb-10 lg:pt-[60px] lg:pb-[60px] bg-white dark:bg-dark">
+  <div class="container">
+    <div class="-mx-4 flex flex-wrap">
+      <div class="w-full px-4">
+        <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+          <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+            Features
+          </h2>
+          <p class="text-base leading-relaxed text-body-color dark:text-dark-6">
+            The components work together and provide debugging features
+            designed for modern <span class="whitespace-nowrap">C++</span> code.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-auto grid max-w-[900px] gap-4 sm:grid-cols-2">
+      {
+        features.map((feature) => (
+          <a
+            href={feature.href}
+            class="group flex flex-col rounded-2xl border border-stroke bg-white p-6 text-left shadow-1 transition duration-300 hover:border-primary dark:border-dark-3 dark:bg-dark dark:hover:border-primary"
+          >
+            <h3 class="mb-2 text-lg font-bold text-dark group-hover:text-primary dark:text-white dark:group-hover:text-primary">
+              {feature.title}
+            </h3>
+            <p class="text-sm text-body-color dark:text-dark-6">
+              {feature.description}
+            </p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<!-- ====== Features Section End -->

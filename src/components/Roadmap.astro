@@ -1,0 +1,74 @@
+---
+const directions = [
+  {
+    title: 'Stable builds for all platforms',
+    description:
+      'Stable versions for Linux, macOS, and Windows, covering both GCC and Clang and both libstdc++ and libc++, including recent versions of the compilers and standard libraries. A VS Code extension build is provided in addition to the standalone application.',
+  },
+  {
+    title: 'Separate the GUI from the debugger core',
+    description:
+      'Split the GUI and the debugger core into independent components that communicate over the Debug Adapter Protocol. The core runs as a standalone debug adapter and can be used by any DAP client.',
+  },
+  {
+    title: 'Advanced features in the console debugger',
+    description:
+      'Integrate all components directly into LLDB, so the command line debugger provides the same advanced features as the GUI: stepping functions, value formatters, and the type name parser.',
+  },
+  {
+    title: 'New type system for LLDB',
+    description:
+      'Replace the Clang type system used by LLDB with a type system based on the code model library (cm). The library provides a generic code model, which can be used to represent debug information. Provide debug information parsers that build the code model for all supported debug formats.',
+  },
+  {
+    title: 'User-defined value formatters',
+    description:
+      'Make it possible to write value formatters for the types of a specific project. Formatters are written in C++ on top of the formatters framework and built as separate modules, and are used by the debugger the same way as the built-in ones. Support for other languages is planned.',
+  },
+  {
+    title: 'Complete the user interface',
+    description:
+      'Refine the existing interface and add the parts that are still missing, including a disassembly view and a memory view. These views are required for low-level debugging, where source level information is not sufficient.',
+  },
+];
+---
+
+<!-- ====== Roadmap Section Start -->
+<section class="bg-gray-2 pt-10 pb-10 dark:bg-dark-2 lg:pt-[60px] lg:pb-[60px]">
+  <div class="container">
+    <div class="-mx-4 flex flex-wrap">
+      <div class="w-full px-4">
+        <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+          <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+            Roadmap
+          </h2>
+          <p class="text-base leading-relaxed text-body-color dark:text-dark-6">
+            The project is in active development. The following directions
+            define the planned work.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-auto grid max-w-[900px] gap-4 sm:grid-cols-2">
+      {
+        directions.map((direction, index) => (
+          <div class="flex flex-col rounded-2xl border border-stroke bg-white p-6 text-left shadow-1 dark:border-dark-3 dark:bg-dark">
+            <div class="mb-3 flex items-center gap-3">
+              <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                {index + 1}
+              </span>
+              <h3 class="text-lg font-bold text-dark dark:text-white">
+                {direction.title}
+              </h3>
+            </div>
+            <p class="text-sm leading-relaxed text-body-color dark:text-dark-6">
+              {direction.description}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<!-- ====== Roadmap Section End -->

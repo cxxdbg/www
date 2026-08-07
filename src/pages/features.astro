@@ -1,0 +1,304 @@
+---
+import { Code } from 'astro/components';
+import FeatureItem from '../components/FeatureItem.astro';
+import Layout from '../layouts/Layout.astro';
+
+const lambdaCode = `int z;
+auto lambda = [z](int x, int y) -> auto {
+    return x + y + z;
+};
+
+auto res = lambda(10, 20);`;
+
+const bindCode = `void foo(int x, int y) {
+    ...
+}
+
+std::function<void(int)> bf = std::bind(&foo, _1, 10);
+bf(20);`;
+
+const callStackCode = `int foo(int x, int y) {
+    ...
+}
+
+std::function<int (int, int)> foo_f = &foo;
+foo_f(10, 20);`;
+
+const navigationCommands = [
+  {
+    name: 'Go to definition',
+    description: 'Opens the definition of the selected variable.',
+  },
+  {
+    name: 'Go to value definition',
+    description:
+      'Opens the definition of the target stored in the value. For standard functional objects this is the function, functor, or lambda the object refers to.',
+  },
+  {
+    name: 'Go to type definition',
+    description: "Opens the definition of the value's type.",
+  },
+];
+
+const stdlibColumns = [
+  ['Containers', 'Strings', 'Smart pointers'],
+  ['Functional types', 'Utility types', 'chrono & regex'],
+];
+---
+
+<Layout description="CxxDbg features." title="Features | CxxDbg">
+  <!-- ====== Intro Section Start -->
+  <section class="bg-white pt-[106px] pb-10 dark:bg-dark lg:pt-[132px] lg:pb-[60px]">
+    <div class="container">
+      <div class="mx-auto max-w-[800px] text-center">
+        <h1
+          class="mb-3 text-4xl font-bold leading-tight text-dark dark:text-white sm:text-5xl sm:leading-[1.2]"
+        >
+          CxxDbg Features
+        </h1>
+        <p class="text-base leading-relaxed text-body-color dark:text-dark-6">
+          Modern <span class="whitespace-nowrap">C++</span> programs make heavy
+          use of standard library types, functional style code, and custom
+          functional wrappers. Existing debuggers provide only partial support
+          for these constructs. A step-into operation at a call through a
+          functional object, such as a <code>std::function</code> or the result
+          of <code>std::bind</code>, enters the standard library implementation
+          instead of the target function. Value formatters typically cover
+          common standard library containers and strings, but provide limited
+          support for functional objects and do not expose the source location
+          of the wrapped target. Stack traces contain a significant number of
+          standard library frames, and function names are difficult to read
+          when complex template parameters are involved. The main goal of the
+          CxxDbg project is to solve these problems.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- ====== Intro Section End -->
+
+  <!-- ====== Advanced Stepping Section Start -->
+  <section id="stepping" class="scroll-mt-24 bg-gray-2 pt-10 pb-10 dark:bg-dark-2 lg:pt-[60px] lg:pb-[60px]">
+    <div class="container">
+      <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+        <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+          Advanced stepping functions
+        </h2>
+      </div>
+
+      <FeatureItem
+        title="Step to the target of functional objects"
+        image="/assets/features/screenshots/step-through.gif"
+        imageAlt="Stepping directly into the target of a functional object"
+        imageSide="right"
+      >
+        <p>
+          A step-into operation at a call through standard functional
+          objects, such as <code>std::function</code> or the result of
+          <code>std::bind</code>, steps directly into the target function.
+          Standard library code is skipped in both directions, so step-out
+          returns to the call site rather than to library internals.
+        </p>
+      </FeatureItem>
+
+      <FeatureItem
+        title="Skip standard library functions"
+        image="/assets/features/screenshots/avoid-std.gif"
+        imageAlt="Stepping over standard library functions"
+        imageSide="left"
+      >
+        <p>
+          Standard library functions are skipped even when the call target is
+          the library function itself. A step-into operation at
+          <code>v.begin()</code> or <code>v.end()</code> does not stop in the
+          library implementation and continues to the first function defined
+          in user code.
+        </p>
+      </FeatureItem>
+
+      <FeatureItem
+        title="Customize step behavior"
+        image="/assets/features/screenshots/step-custom.gif"
+        imageAlt="Customizing which functions to step through"
+        imageSide="right"
+      >
+        <p>
+          Stepping is not limited to the standard library. The regular
+          expressions used to detect step targets are configurable, so
+          third-party libraries and user-defined functional objects can be
+          handled the same way. In the example, adding
+          <code>^my_functor::</code> to the step settings steps through a
+          user-defined <code>my_functor</code> object to its target.
+        </p>
+      </FeatureItem>
+    </div>
+  </section>
+  <!-- ====== Advanced Stepping Section End -->
+
+  <!-- ====== Value Formatters Section Start -->
+  <section id="value-formatters" class="scroll-mt-24 bg-white pt-10 pb-10 dark:bg-dark lg:pt-[60px] lg:pb-[60px]">
+    <div class="container">
+      <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+        <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+          Value formatters
+        </h2>
+        <p class="text-base text-body-color dark:text-dark-6">
+          Values are formatted by <a
+            href="https://github.com/cxxdbg/dbgfmt"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-primary hover:underline">dbgfmt</a>, a
+          value and type formatting framework with built-in formatters for
+          libstdc++ and libc++. Alongside the formatted value, it extracts
+          the source location of the value and its type. The framework does
+          not depend on any debugger and can be reused in other tools.
+        </p>
+      </div>
+
+      <FeatureItem
+        title="Lambda expressions"
+        image="/assets/features/screenshots/display-lambda.png"
+        imageAlt="Displaying the value of a lambda expression"
+        imageSide="right"
+      >
+        <p>
+          The value of a lambda shows the name of the target lambda
+          expression and its position in the source code, together with the
+          captured variables. In the example, the value of
+          <code>lambda</code> shows the captured <code>z</code>.
+        </p>
+        <Code
+          code={lambdaCode}
+          lang="cpp"
+          experimentalThemes={{ light: 'github-light', dark: 'github-dark' }}
+        />
+      </FeatureItem>
+
+      <FeatureItem
+        title="Standard functional objects"
+        image="/assets/features/screenshots/display-bind.png"
+        imageAlt="Displaying the value of a std::bind result"
+        imageSide="left"
+      >
+        <p>
+          The value of a <code>std::bind</code> result shows the target
+          function together with the bound arguments and placeholders.
+          <code>std::function</code> and <code>std::reference_wrapper</code>
+          values are formatted as well. In the example, a
+          <code>std::bind</code> result is wrapped in a
+          <code>std::function</code> object.
+        </p>
+        <Code
+          code={bindCode}
+          lang="cpp"
+          experimentalThemes={{ light: 'github-light', dark: 'github-dark' }}
+        />
+      </FeatureItem>
+
+      <div class="-mx-4 flex flex-wrap items-center">
+        <div class="w-full px-4 lg:w-1/2">
+          <h3 class="mb-4 text-xl font-bold text-dark dark:text-white sm:text-2xl">
+            Standard library coverage
+          </h3>
+          <p class="mb-8 text-base leading-relaxed text-body-color dark:text-dark-6">
+            Built-in formatters cover the following standard library types,
+            for both libstdc++ and libc++.
+          </p>
+          <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+            {
+              stdlibColumns.map((column) => (
+                <ul class="space-y-3">
+                  {column.map((item) => (
+                    <li class="flex items-center gap-2 text-body-color dark:text-dark-6">
+                      <svg class="shrink-0 fill-current text-primary" width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L9 12.58l7.3-7.3a1 1 0 0 1 1.4 0Z" />
+                      </svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              ))
+            }
+          </div>
+        </div>
+        <div class="mt-10 w-full px-4 lg:mt-0 lg:w-1/2">
+          <div class="mx-auto grid max-w-[420px] grid-cols-2 gap-4">
+            <div class="rounded-2xl border border-stroke bg-white p-6 text-center shadow-1 dark:border-dark-3 dark:bg-dark">
+              <h4 class="mb-1 text-lg font-bold text-dark dark:text-white">libstdc++</h4>
+              <p class="text-sm text-body-color dark:text-dark-6">The GNU C++ Library</p>
+            </div>
+            <div class="rounded-2xl border border-stroke bg-white p-6 text-center shadow-1 dark:border-dark-3 dark:bg-dark">
+              <h4 class="mb-1 text-lg font-bold text-dark dark:text-white">libc++</h4>
+              <p class="text-sm text-body-color dark:text-dark-6">The LLVM/Clang C++ Library</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ====== Value Formatters Section End -->
+
+  <!-- ====== Call Stack Section Start -->
+  <section id="call-stack" class="scroll-mt-24 bg-gray-2 pt-10 pb-10 dark:bg-dark-2 lg:pt-[60px] lg:pb-[60px]">
+    <div class="container">
+      <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+        <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+          Call stack grouping
+        </h2>
+      </div>
+
+      <FeatureItem
+        title="Frames of no interest become child items"
+        image="/assets/features/screenshots/call-stack.gif"
+        imageAlt="Call stack panel with standard library frames folded and expanded"
+        imageSide="right"
+      >
+        <p>
+          Frames of no interest are moved into child items, so user frames
+          are not separated by library code. In the example, a call
+          through <code>std::function</code> adds four standard library
+          frames between <code>main</code> and <code>foo</code>. They are
+          grouped under <code>foo</code> and can be expanded when low-level
+          debugging is needed.
+        </p>
+        <Code
+          code={callStackCode}
+          lang="cpp"
+          experimentalThemes={{ light: 'github-light', dark: 'github-dark' }}
+        />
+      </FeatureItem>
+    </div>
+  </section>
+  <!-- ====== Call Stack Section End -->
+
+  <!-- ====== Source Code Navigation Section Start -->
+  <section id="navigation" class="scroll-mt-24 bg-white pt-10 pb-10 dark:bg-dark lg:pt-[60px] lg:pb-[60px]">
+    <div class="container">
+      <div class="mb-10 mx-auto max-w-[600px] text-center lg:mb-[60px]">
+        <h2 class="mb-3 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+          Source code navigation
+        </h2>
+        <p class="text-base text-body-color dark:text-dark-6">
+          dbgfmt extracts the source locations of values and their types, so
+          the value tree can open the relevant code directly. Three commands
+          are available from the context menu.
+        </p>
+      </div>
+
+      <div class="mx-auto grid max-w-[900px] gap-4 sm:grid-cols-3">
+        {
+          navigationCommands.map((command) => (
+            <div class="rounded-2xl border border-stroke bg-white p-6 text-left shadow-1 dark:border-dark-3 dark:bg-dark">
+              <h3 class="mb-2 text-lg font-bold text-dark dark:text-white">
+                {command.name}
+              </h3>
+              <p class="text-sm text-body-color dark:text-dark-6">
+                {command.description}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+  <!-- ====== Source Code Navigation Section End -->
+</Layout>
