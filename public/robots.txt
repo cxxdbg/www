@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cxxdbg.org/sitemap-index.xml
