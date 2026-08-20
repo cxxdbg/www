@@ -3,7 +3,7 @@
 // Update `version` when a new release is published — every download link and
 // release URL on the site is derived from it.
 export const release = {
-  version: '0.1.0',
+  version: '0.1.1',
   repo: 'cxxdbg/cxxdbg',
 };
 
