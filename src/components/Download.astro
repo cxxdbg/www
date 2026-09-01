@@ -1,10 +1,34 @@
 ---
-import { assetName, downloadUrl, release, releaseUrl, releasesUrl } from '../config';
+import { Code } from 'astro/components';
+import {
+  assetName,
+  downloadUrl,
+  release,
+  releaseFileUrl,
+  releaseUrl,
+  marketplaceUrl,
+  releasesUrl,
+  vscodeAssetName,
+} from '../config';
 
-const platforms = [
-  { name: 'Linux', platform: 'linux', extensions: ['deb', 'rpm', 'tar.bz2'] },
-  { name: 'macOS', platform: 'macos', extensions: ['dmg', 'zip'] },
-  { name: 'Windows', platform: 'windows', extensions: ['zip'] },
+const build = (platform: string, extensions: string[]) =>
+  extensions.map((extension) => ({
+    name: assetName(platform, extension),
+    url: downloadUrl(platform, extension),
+  }));
+
+const brewInstall = `brew tap cxxdbg/cxxdbg
+brew install --cask cxxdbg`;
+
+const sections = [
+  { name: 'Linux', files: build('linux', ['deb', 'rpm', 'tar.bz2']) },
+  { name: 'Windows', files: build('windows', ['zip']) },
+  { name: 'macOS', files: build('macos', ['dmg', 'zip']), homebrew: true },
+  {
+    name: 'VS Code extension',
+    files: [{ name: vscodeAssetName(), url: releaseFileUrl(vscodeAssetName()) }],
+    marketplace: true,
+  },
 ];
 ---
 
@@ -20,8 +44,8 @@ const platforms = [
             Download
           </h1>
           <p class="text-base leading-relaxed text-body-color dark:text-dark-6">
-            CxxDbg {release.version} is available for Linux, macOS, and
-            Windows. Release notes and the full list of files are on the
+            CxxDbg {release.version} is available for Linux, Windows, and
+            macOS. Release notes and the full list of files are on the
             <a
               href={releaseUrl}
               target="_blank"
@@ -33,25 +57,52 @@ const platforms = [
       </div>
     </div>
 
-    <div class="mx-auto grid max-w-[900px] gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="mx-auto grid max-w-[700px] gap-4 sm:grid-cols-2">
       {
-        platforms.map((platform) => (
+        sections.map((section) => (
           <div class="flex flex-col rounded-2xl border border-stroke bg-white p-6 shadow-1 dark:border-dark-3 dark:bg-dark">
             <h2 class="mb-4 text-lg font-bold text-dark dark:text-white">
-              {platform.name}
+              {section.name}
             </h2>
             <ul class="flex flex-col gap-2">
-              {platform.extensions.map((extension) => (
+              {section.files.map((file) => (
                 <li>
                   <a
-                    href={downloadUrl(platform.platform, extension)}
+                    href={file.url}
                     class="break-all font-mono text-sm text-primary hover:underline"
                   >
-                    {assetName(platform.platform, extension)}
+                    {file.name}
                   </a>
                 </li>
               ))}
             </ul>
+            {section.marketplace && (
+              <div class="mt-4">
+                <h3 class="mb-2 text-sm font-medium text-dark dark:text-white">
+                  Install from Marketplace
+                </h3>
+                <a
+                  href={marketplaceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-primary hover:underline"
+                >
+                  Visual Studio Marketplace
+                </a>
+              </div>
+            )}
+            {section.homebrew && (
+              <div class="mt-4">
+                <h3 class="mb-2 text-sm font-medium text-dark dark:text-white">
+                  Install with Homebrew
+                </h3>
+                <Code
+                  code={brewInstall}
+                  lang="sh"
+                  experimentalThemes={{ light: 'github-light', dark: 'github-dark' }}
+                />
+              </div>
+            )}
           </div>
         ))
       }
